@@ -10,12 +10,12 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-400 via-yellow-400 to-red-500 flex items-center justify-center p-10">
+    <div className="min-h-screen bg-blue flex items-center justify-center p-10">
 
       <div className="bg-white/30 backdrop-blur-xl p-10 rounded-3xl border border-white/40 shadow-2xl text-center max-w-xl">
 
-        <h1 className="text-5xl font-extrabold text-white drop-shadow-lg mb-4 animate-bounce">
-          🎉 Selamat Datang! 🎉
+        <h1 className="text-5xl font-extrabold text-black drop-shadow-lg mb-4 animate-bounce">
+         Selamat Datang! 
         </h1>
 
         <p className="text-white text-lg mb-10">

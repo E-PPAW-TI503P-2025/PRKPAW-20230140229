@@ -23,17 +23,21 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    nama: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     checkIn: {
       type: DataTypes.DATE,
       allowNull: false,
     },
     checkOut: {
       type: DataTypes.DATE,
-      allowNull: true, // Boleh null
+      allowNull: true,
+    },
+    latitude: {
+      type: DataTypes.DECIMAL(10, 8),
+      allowNull: true,
+    },
+    longitude: {
+      type: DataTypes.DECIMAL(11, 8),
+      allowNull: true,
     }
   }, {
     sequelize,

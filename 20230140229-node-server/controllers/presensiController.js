@@ -3,10 +3,10 @@ const { format } = require("date-fns-tz");
 const timeZone = "Asia/Jakarta";
 
 const CheckIn = async (req, res) => {
-  // Isi fungsi CheckIn Anda
   try {
     const { id: userId, nama: userName } = req.user;
     const waktuSekarang = new Date();
+    const { latitude, longitude } = req.body;
 
     const existingRecord = await Presensi.findOne({
       where: { userId: userId, checkOut: null },
@@ -20,15 +20,17 @@ const CheckIn = async (req, res) => {
 
     const newRecord = await Presensi.create({
       userId: userId,
-      nama: userName,
       checkIn: waktuSekarang,
+      latitude: latitude,
+      longitude: longitude,
     });
 
     const formattedData = {
       userId: newRecord.userId,
-      nama: newRecord.nama,
       checkIn: format(newRecord.checkIn, "yyyy-MM-dd HH:mm:ssXXX", { timeZone }),
       checkOut: null,
+      latitude: newRecord.latitude,
+      longitude: newRecord.longitude,
     };
 
     res.status(201).json({
@@ -45,10 +47,10 @@ const CheckIn = async (req, res) => {
 };
 
 const CheckOut = async (req, res) => {
-  // Isi fungsi CheckOut Anda
   try {
     const { id: userId, nama: userName } = req.user;
     const waktuSekarang = new Date();
+    const { latitude, longitude } = req.body;
 
     const recordToUpdate = await Presensi.findOne({
       where: { userId: userId, checkOut: null },
@@ -61,13 +63,16 @@ const CheckOut = async (req, res) => {
     }
 
     recordToUpdate.checkOut = waktuSekarang;
+    if (latitude) recordToUpdate.latitude = latitude;
+    if (longitude) recordToUpdate.longitude = longitude;
     await recordToUpdate.save();
 
     const formattedData = {
       userId: recordToUpdate.userId,
-      nama: recordToUpdate.nama,
       checkIn: format(recordToUpdate.checkIn, "yyyy-MM-dd HH:mm:ssXXX", { timeZone }),
       checkOut: format(recordToUpdate.checkOut, "yyyy-MM-dd HH:mm:ssXXX", { timeZone }),
+      latitude: recordToUpdate.latitude,
+      longitude: recordToUpdate.longitude,
     };
 
     res.json({
@@ -113,13 +118,12 @@ const deletePresensi = async (req, res) => {
 const updatePresensi = async (req, res) => {
   try {
     const presensiId = req.params.id;
-    const { checkIn, checkOut, nama } = req.body;
-    // Pengecekan ini harusnya sudah ditangani oleh express-validator (lihat di middleware/validationMiddleware.js)
-    // Namun, sebagai fallback di controller, kita biarkan saja.
-    if (checkIn === undefined && checkOut === undefined && nama === undefined) {
+    const { checkIn, checkOut, latitude, longitude } = req.body;
+
+    if (checkIn === undefined && checkOut === undefined && latitude === undefined && longitude === undefined) {
       return res.status(400).json({
         message:
-          "Request body tidak berisi data yang valid untuk diupdate (checkIn, checkOut, atau nama).",
+          "Request body tidak berisi data yang valid untuk diupdate (checkIn, checkOut, latitude, atau longitude).",
       });
     }
     const recordToUpdate = await Presensi.findByPk(presensiId);
@@ -131,7 +135,8 @@ const updatePresensi = async (req, res) => {
 
     recordToUpdate.checkIn = checkIn || recordToUpdate.checkIn;
     recordToUpdate.checkOut = checkOut || recordToUpdate.checkOut;
-    recordToUpdate.nama = nama || recordToUpdate.nama;
+    recordToUpdate.latitude = latitude !== undefined ? latitude : recordToUpdate.latitude;
+    recordToUpdate.longitude = longitude !== undefined ? longitude : recordToUpdate.longitude;
     await recordToUpdate.save();
 
     res.json({

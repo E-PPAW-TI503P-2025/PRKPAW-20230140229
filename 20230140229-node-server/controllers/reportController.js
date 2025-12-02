@@ -1,23 +1,27 @@
-const { Presensi } = require("../models"); // Pastikan path model benar
-const { Op } = require("sequelize"); 
-const timeZone = "Asia/Jakarta"; // Asumsi timeZone
+const { Presensi, User } = require("../models");
+const { Op } = require("sequelize");
+const timeZone = "Asia/Jakarta";
 
 const getDailyReport = async (req, res) => {
   try {
-    const { tanggalMulai, tanggalSelesai } = req.query;
+    const { tanggalMulai, tanggalSelesai, nama } = req.query;
     let whereClause = {};
+    let userWhereClause = {};
+
+    if (nama) {
+      userWhereClause.nama = {
+        [Op.like]: `%${nama}%`
+      };
+    }
 
     if (tanggalMulai && tanggalSelesai) {
       const dateStart = new Date(tanggalMulai);
       const dateEnd = new Date(tanggalSelesai);
-      
-      // Atur tanggalMulai ke awal hari (00:00:00.000)
+         
       dateStart.setHours(0, 0, 0, 0); 
-
-      // Atur tanggalSelesai ke akhir hari (23:59:59.999)
+    
       dateEnd.setHours(23, 59, 59, 999); 
 
-      // Gunakan Op.between pada kolom checkIn
       whereClause.checkIn = {
         [Op.between]: [dateStart, dateEnd],
       };
@@ -29,6 +33,12 @@ const getDailyReport = async (req, res) => {
 
     const dailyReport = await Presensi.findAll({
       where: whereClause,
+      include: [{
+        model: User,
+        as: 'user',
+        where: userWhereClause,
+        attributes: ['id', 'nama', 'email', 'role']
+      }],
       order: [['checkIn', 'ASC']],
     });
 
