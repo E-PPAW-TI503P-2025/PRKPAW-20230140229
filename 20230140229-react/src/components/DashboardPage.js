@@ -1,36 +1,34 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function DashboardPage() {
+function DashboardPage() {
   const navigate = useNavigate();
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Hapus token dari local storage
+    navigate("/login"); // Arahkan kembali ke halaman login
   };
 
   return (
-    <div className="min-h-screen bg-blue flex items-center justify-center p-10">
-
-      <div className="bg-white/30 backdrop-blur-xl p-10 rounded-3xl border border-white/40 shadow-2xl text-center max-w-xl">
-
-        <h1 className="text-5xl font-extrabold text-black drop-shadow-lg mb-4 animate-bounce">
-         Selamat Datang! 
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-8">
+      <div className="bg-white p-10 rounded-lg shadow-md text-center">
+        <h1 className="text-3xl font-bold text-green-600 mb-4">
+          Login Sukses!
         </h1>
 
-        <p className="text-white text-lg mb-10">
-          ANDA BERHASIL MASUK KE DASHBOARD
+        <p className="text-lg text-gray-700 mb-8">
+          Selamat Datang di Halaman Dashboard Anda.
         </p>
 
         <button
-          onClick={logout}
-          className="px-8 py-3 bg-white text-red-600 font-bold rounded-xl shadow-lg hover:bg-red-100 transition"
+          onClick={handleLogout}
+          className="py-2 px-6 bg-red-500 text-white font-semibold rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
         >
           Logout
         </button>
-
       </div>
-
     </div>
   );
 }
+
+export default DashboardPage;

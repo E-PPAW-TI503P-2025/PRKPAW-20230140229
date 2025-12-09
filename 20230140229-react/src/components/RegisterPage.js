@@ -1,99 +1,130 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
 
-export default function RegisterPage() {
-  const [nama, setNama] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('mahasiswa');
+function RegisterPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [nama, setNama] = useState("");
+  const [role, setRole] = useState("mahasiswa");
+
   const [error, setError] = useState(null);
-
   const navigate = useNavigate();
 
-  const handleRegister = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
     try {
-      await axios.post('http://localhost:3001/api/auth/register', {
-        nama, email, password, role
+      await axios.post("http://localhost:3001/api/auth/register", {
+        nama: nama,
+        email: email,
+        password: password,
+        role: role,
       });
 
-      alert('Registrasi berhasil!');
-      navigate('/login');
+      navigate("/login");
     } catch (err) {
-      setError(err.response ? err.response.data.message : 'Registrasi gagal');
+      setError(err.response ? err.response.data.message : "Registrasi gagal");
     }
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6">
-      <div className="bg-black/20 backdrop-blur-xl p-10 rounded-2xl shadow-2xl border border-white/30 max-w-md w-full">
-
-        <h1 className="text-4xl font-extrabold text-black text-center mb-8 tracking-wide">
-          Register
-        </h1>
-
-        <form onSubmit={handleRegister} className="space-y-6">
-
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+          Buat Akun Baru
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="text-black font-semibold">Nama</label>
+            <label
+              htmlFor="nama"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Nama Lengkap:
+            </label>
             <input
+              id="nama"
               type="text"
-              className="w-full mt-2 p-3 rounded-lg bg-black/30 text-black placeholder-black/80 focus:ring-2 focus:ring-white"
               value={nama}
               onChange={(e) => setNama(e.target.value)}
-              placeholder="Masukkan nama..."
+              required
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-
           <div>
-            <label className="text-black font-semibold">Email</label>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email:
+            </label>
             <input
+              id="email"
               type="email"
-              className="w-full mt-2 p-3 rounded-lg bg-black/30 text-black placeholder-black/80 focus:ring-2 focus:ring-white"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Masukkan email..."
+              required
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-
           <div>
-            <label className="text-black font-semibold">Password</label>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password:
+            </label>
             <input
+              id="password"
               type="password"
-              className="w-full mt-2 p-3 rounded-lg bg-black/30 text-black placeholder-black/80 focus:ring-2 focus:ring-white"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Masukkan password..."
+              required
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
           <div>
-            <label className="text-black font-semibold">Role</label>
+            <label
+              htmlFor="role"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Daftar sebagai:
+            </label>
             <select
-              className="w-full mt-2 p-3 rounded-lg bg-black/30 text-black focus:ring-2 focus:ring-white"
+              id="role"
               value={role}
               onChange={(e) => setRole(e.target.value)}
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="mahasiswa" className="text-white">Mahasiswa</option>
-              <option value="admin" className="text-white">Admin</option>
+              <option value="mahasiswa">Mahasiswa</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 
-          {error && <p className="text-red-200 text-center">{error}</p>}
-
-          <button className="w-full py-3 bg-white text-white-700 font-bold rounded-xl shadow-lg hover:bg-white-100 transition">
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700"
+          >
             Register
           </button>
         </form>
+        {error && (
+          <p className="text-red-600 text-sm mt-4 text-center">{error}</p>
+        )}
 
-        <p className="text-center text-black mt-6">
-          Sudah punya akun? <a href="/login" className="underline">Login</a>
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Sudah punya akun?{" "}
+          <Link
+            to="/login"
+            className="font-medium text-blue-600 hover:text-blue-500"
+          >
+            Login di sini
+          </Link>
         </p>
-
       </div>
     </div>
   );
 }
+export default RegisterPage;

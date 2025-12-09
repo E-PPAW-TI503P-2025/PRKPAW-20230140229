@@ -1,61 +1,40 @@
 const { Presensi, User } = require("../models");
 const { Op } = require("sequelize");
-const timeZone = "Asia/Jakarta";
 
-const getDailyReport = async (req, res) => {
+const { format } = require("date-fns-tz");
+
+exports.getDailyReport = async (req, res) => {
   try {
-    const { tanggalMulai, tanggalSelesai, nama } = req.query;
-    let whereClause = {};
-    let userWhereClause = {};
+    const { nama } = req.query;
+
+    let options = {
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["nama"],
+        },
+      ],
+    };
 
     if (nama) {
-      userWhereClause.nama = {
-        [Op.like]: `%${nama}%`
+      // Baris ini akan error jika 'Op' tidak diimpor
+      options.include[0].where = {
+        nama: {
+          [Op.like]: `%${nama}%`,
+        },
       };
     }
 
-    if (tanggalMulai && tanggalSelesai) {
-      const dateStart = new Date(tanggalMulai);
-      const dateEnd = new Date(tanggalSelesai);
-         
-      dateStart.setHours(0, 0, 0, 0); 
-    
-      dateEnd.setHours(23, 59, 59, 999); 
-
-      whereClause.checkIn = {
-        [Op.between]: [dateStart, dateEnd],
-      };
-    } else if (tanggalMulai || tanggalSelesai) {
-        return res.status(400).json({ 
-            message: "Harap berikan kedua tanggalMulai dan tanggalSelesai, atau tidak sama sekali." 
-        });
-    }
-
-    const dailyReport = await Presensi.findAll({
-      where: whereClause,
-      include: [{
-        model: User,
-        as: 'user',
-        where: userWhereClause,
-        attributes: ['id', 'nama', 'email', 'role']
-      }],
-      order: [['checkIn', 'ASC']],
-    });
+    const records = await Presensi.findAll(options);
 
     res.json({
-      message: "Laporan presensi berhasil diambil.",
-      totalRecords: dailyReport.length,
-      data: dailyReport,
+      reportDate: new Date().toLocaleDateString(),
+      data: records,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ 
-        message: "Terjadi kesalahan pada server", 
-        error: error.message 
-    });
+    res
+      .status(500)
+      .json({ message: "Gagal mengambil laporan", error: error.message });
   }
-};
-
-module.exports = {
-  getDailyReport,
 };

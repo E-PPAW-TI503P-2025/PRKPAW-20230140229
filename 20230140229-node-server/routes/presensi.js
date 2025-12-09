@@ -1,17 +1,20 @@
-// routes/presensi.js
-const express = require('express');
-const router = express.Router(); // <--- Variabel 'router' didefinisikan di sini
-const presensiController = require('../controllers/presensiController');
-const { updatePresensiValidation } = require('../middleware/validationMiddleware'); // Asumsi path
+const express = require("express");
+const router = express.Router();
+const presensiController = require("../controllers/presensiController");
+const { authenticateToken } = require("../middleware/permissionMiddleware");
 
-// Asumsi middleware lainnya
-const { addUserData } = require('../middleware/permissionMiddleware'); 
-router.use(addUserData);
+router.use(authenticateToken);
 
-// Semua definisi router HARUS ada di sini:
-router.post('/check-in', presensiController.CheckIn);
-router.post('/check-out', presensiController.CheckOut);
-router.put('/:id', updatePresensiValidation, presensiController.updatePresensi); // <--- Baris yang menyebabkan error
-router.delete('/:id', presensiController.deletePresensi);
+router.post(
+  "/check-in",
+  [authenticateToken, presensiController.upload.single("image")],
+  presensiController.CheckIn
+);
+
+router.post("/check-out", presensiController.CheckOut);
+
+router.put("/:id", presensiController.updatePresensi);
+
+router.delete("/:id", presensiController.hapusPresensi);
 
 module.exports = router;
